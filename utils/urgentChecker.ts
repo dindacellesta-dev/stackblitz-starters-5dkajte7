@@ -4,7 +4,7 @@ export const URGENT_KEYWORDS = [
   "tidak mau hidup", "gak kuat hidup", "udah capek hidup"
 ];
 
-export function findFlaggedWords(text) {
+export function findFlaggedWords(text: string | undefined | null): string[] {
   if (!text) return [];
   const s = text.toLowerCase();
   return URGENT_KEYWORDS.filter((w) => s.includes(w));
