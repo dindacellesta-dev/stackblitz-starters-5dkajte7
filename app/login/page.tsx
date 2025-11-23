@@ -10,12 +10,9 @@ export default function LoginPage() {
   const handleLogin = () => {
     const trimmed = code.trim();
 
-    // ---- CEK LOGIN ----
     if (trimmed === "12345") {
-      // Murid
       router.push("/beranda");
     } else if (trimmed.toLowerCase() === "12345-bk") {
-      // Guru BK
       router.push("/bk/dashboard");
     } else {
       alert("Kode salah! Coba lagi.");
@@ -32,7 +29,18 @@ export default function LoginPage() {
         <input
           type="text"
           placeholder="Masukkan kode"
-          className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="
+            w-full p-3 
+            border border-gray-300 
+            rounded-lg 
+            mb-4 
+            text-gray-900
+            placeholder-gray-500
+            bg-white
+            focus:outline-none 
+            focus:ring-2 
+            focus:ring-blue-400
+          "
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />

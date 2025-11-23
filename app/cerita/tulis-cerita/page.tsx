@@ -1,82 +1,85 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { findFlaggedWords } from "@/utils/urgentChecker";
+import { useRouter } from "next/navigation";
 
 export default function TulisCeritaPage() {
-  const router = useRouter();
   const [judul, setJudul] = useState("");
   const [isi, setIsi] = useState("");
+  const router = useRouter();
 
-  const submitCerita = async () => {
-    // 🔍 Deteksi kata terlarang
-    const flagged = findFlaggedWords(judul + " " + isi);
-    const isUrgent = flagged.length > 0;
+  const kirimCerita = async () => {
+    if (!judul.trim() || !isi.trim()) {
+      alert("Judul dan isi harus diisi ya!");
+      return;
+    }
 
     await addDoc(collection(db, "cerita"), {
       judul,
       isi,
       createdAt: serverTimestamp(),
-
-      // 🆕 data tambahan untuk urgent
-      isUrgent: isUrgent,
-      flaggedWords: flagged,
     });
 
-    alert("Cerita berhasil disimpan ✨");
-    setJudul("");
-    setIsi("");
+    router.push("/beranda");
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F9FF] px-6 py-10 flex flex-col items-center relative">
+    <div className="min-h-screen bg-[#CDE7FF] flex justify-center py-10 px-5">
+      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
 
-      {/* Tombol Kembali */}
-      <button
-        onClick={() => router.push("/beranda")}
-        className="absolute top-4 left-4 bg-white text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-100 z-50"
-      >
-        ← 
-      </button>
-
-      {/* Card Container */}
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-lg px-6 py-6 border border-[#E3ECFF] mt-10">
-        <h1 className="text-2xl font-bold text-gray-800 text-center mb-4">
-           Tulis Cerita Kamu
+        <h1 className="text-xl font-bold text-blue-700 mb-4">
+          Tulis Ceritamu ✨
         </h1>
 
         {/* Input Judul */}
         <input
+          type="text"
+          placeholder="Judul cerita…"
+          className="
+            w-full p-3 
+            border border-gray-300 
+            rounded-xl 
+            mb-4
+            text-gray-900
+            placeholder-gray-500
+            bg-white
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-400
+          "
           value={judul}
           onChange={(e) => setJudul(e.target.value)}
-          placeholder="Judul Cerita..."
-          className="w-full p-3 mb-4 rounded-xl bg-[#F8FBFF] border border-[#D9E6FF] outline-none 
-                     focus:ring-2 focus:ring-[#9EC5FF] transition"
         />
 
-        {/* Input Isi Cerita */}
+        {/* Input Isi */}
         <textarea
+          rows={6}
+          placeholder="Tulis ceritamu di sini…"
+          className="
+            w-full p-3 
+            border border-gray-300 
+            rounded-xl 
+            text-gray-900
+            placeholder-gray-500
+            bg-white
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-400
+          "
           value={isi}
           onChange={(e) => setIsi(e.target.value)}
-          placeholder="Tulis isi cerita kamu di sini..."
-          className="w-full p-3 h-40 rounded-xl bg-[#F8FBFF] border border-[#D9E6FF] outline-none
-                     focus:ring-2 focus:ring-[#9EC5FF] transition"
         />
 
-        {/* Tombol Submit */}
         <button
-          onClick={submitCerita}
-          className="mt-5 w-full bg-gradient-to-r from-[#7AB3FF] to-[#A3C8FF] 
-                     text-white py-3 rounded-2xl text-lg font-semibold shadow-md
-                     hover:opacity-90 transition"
+          onClick={kirimCerita}
+          className="w-full mt-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all"
         >
-          Simpan Cerita 
+          Kirim Cerita
         </button>
-      </div>
 
+      </div>
     </div>
   );
 }
