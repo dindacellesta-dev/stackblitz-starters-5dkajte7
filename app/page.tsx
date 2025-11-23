@@ -1,5 +1,5 @@
 "use client";
-import ChatBox from "./components/ChatBox.tsx";
+import ChatBox from "./components/ChatBox";
 
 export default function Home() {
   return (
