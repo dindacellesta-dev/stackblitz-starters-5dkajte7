@@ -6,7 +6,16 @@ import { collection, query, where, orderBy, onSnapshot } from "firebase/firestor
 import { useRouter } from "next/navigation";
 
 export default function UrgentPage() {
-  const [urgentList, setUrgentList] = useState([]);
+  const [urgentList, setUrgentList] = useState<
+    {
+      id: string;
+      judul?: string;
+      isi?: string;
+      flaggedWords?: string[];
+      [key: string]: any;
+    }[]
+  >([]);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -59,7 +68,7 @@ export default function UrgentPage() {
             </p>
 
             <p className="mt-3 text-sm text-red-600">
-              ⚠ Kata terdeteksi: {c.flaggedWords.join(", ")}
+              ⚠ Kata terdeteksi: {c.flaggedWords?.join(", ")}
             </p>
           </div>
         ))}
