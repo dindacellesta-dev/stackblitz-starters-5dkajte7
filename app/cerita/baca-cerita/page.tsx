@@ -1,92 +1,48 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
 import { db } from "@/lib/firebase";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 
-interface CeritaItem {
-  id: string;
-  judul?: string;
-  isi?: string;
-  createdAt?: any;
-  [key: string]: any;
+interface Cerita {
+  judul: string;
+  isi: string;
+  balasan?: string;
 }
 
-export default function BacaCeritaPage() {
-  const [listCerita, setListCerita] = useState<CeritaItem[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null); 
-  const router = useRouter();
-
-  const scrollRef = useRef<{ [key: string]: HTMLDivElement | null }>({});
+export default function BacaCeritaPage({ params }: { params: { id: string } }) {
+  const { id } = params;
+  const [cerita, setCerita] = useState<Cerita | null>(null);
 
   useEffect(() => {
-    const q = query(collection(db, "cerita"), orderBy("createdAt", "desc"));
-
-    const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as CeritaItem[];
-
-      setListCerita(data);
-    });
-
-    return () => unsub();
-  }, []);
-
-  const toggleOpen = (id: string) => {
-    setOpenId((prev) => (prev === id ? null : id));
-
-    setTimeout(() => {
-      if (scrollRef.current[id]) {
-        scrollRef.current[id]?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+    const fetch = async () => {
+      const snap = await getDoc(doc(db, "cerita", id));
+      if (snap.exists()) {
+        setCerita(snap.data() as Cerita);
       }
-    }, 150);
-  };
+    };
+    fetch();
+  }, [id]);
+
+  if (!cerita) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-[#F1F5FF] px-5 py-8 flex flex-col items-center relative">
+    <div className="min-h-screen bg-[#F1F5FF] p-6">
+      <h1 className="text-xl font-bold">{cerita.judul}</h1>
 
-      <button
-        onClick={() => router.push("/beranda")}
-        className="absolute top-4 left-4 bg-white text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-100 z-50"
-      >
-        ←
-      </button>
-
-      <h1 className="text-3xl font-bold text-gray-800 mb-8 mt-10">
-        Baca Cerita
-      </h1>
-
-      <div className="w-full max-w-xl space-y-5 pb-10">
-        {listCerita.map((c) => (
-          <div
-            key={c.id}
-            ref={(el) => (scrollRef.current[c.id] = el)}
-            className="bg-white border border-[#DDE7FF] rounded-3xl shadow-md p-5"
-          >
-            <button
-              onClick={() => toggleOpen(c.id)}
-              className="w-full text-left flex justify-between items-center"
-            >
-              <h2 className="text-lg font-semibold text-gray-900">{c.judul}</h2>
-              <span className="text-gray-600">
-                {openId === c.id ? "▲" : "▼"}
-              </span>
-            </button>
-
-            {openId === c.id && (
-              <p className="text-gray-700 mt-3 whitespace-pre-line leading-relaxed">
-                {c.isi}
-              </p>
-            )}
-          </div>
-        ))}
+      <div className="bg-white p-4 rounded-xl shadow mt-4">
+        <p className="whitespace-pre-line">{cerita.isi}</p>
       </div>
+
+      {/* === BAGIAN BALASAN === */}
+      {cerita.balasan && (
+        <div className="bg-blue-50 p-4 rounded-xl mt-4 border border-blue-200">
+          <h2 className="font-semibold text-blue-700">Balasan Guru BK:</h2>
+          <p className="mt-1 whitespace-pre-line text-gray-700">
+            {cerita.balasan}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
