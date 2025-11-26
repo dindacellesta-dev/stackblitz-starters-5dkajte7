@@ -18,24 +18,32 @@ type Cerita = {
   balasan?: string;
 };
 
-export default function DetailCeritaBK({ params }: DetailCeritaProps): JSX.Element {
+export default function DetailCeritaBK({
+  params,
+}: DetailCeritaProps): JSX.Element {
   const { id } = params;
+
   const [cerita, setCerita] = useState<Cerita | null>(null);
   const [balasan, setBalasan] = useState("");
 
   useEffect(() => {
     const fetch = async () => {
       const snap = await getDoc(doc(db, "cerita", id));
+
       if (snap.exists()) {
-        setCerita(snap.data() as Cerita);
-        setBalasan((snap.data() as Cerita).balasan || "");
+        const data = snap.data() as Cerita;
+        setCerita(data);
+        setBalasan(data.balasan || "");
       }
     };
+
     fetch();
   }, [id]);
 
   const kirimBalasan = async () => {
-    await updateDoc(doc(db, "cerita", id), { balasan });
+    await updateDoc(doc(db, "cerita", id), {
+      balasan,
+    });
     alert("Balasan terkirim!");
   };
 
@@ -43,16 +51,18 @@ export default function DetailCeritaBK({ params }: DetailCeritaProps): JSX.Eleme
 
   return (
     <div className="min-h-screen bg-[#CDE7FF] p-6">
+
       {/* Judul Cerita */}
       <h1 className="text-xl font-bold mb-4">{cerita.judul}</h1>
 
       {/* Isi Cerita */}
       <div className="bg-white p-4 rounded-xl shadow-md mb-6">
-        <p>{cerita.isi}</p>
+        <p className="whitespace-pre-line">{cerita.isi}</p>
       </div>
 
       {/* Balasan Guru BK */}
       <h2 className="font-semibold mb-2">Balasan Guru BK:</h2>
+
       <textarea
         className="w-full p-3 rounded-xl border"
         rows={5}
@@ -62,7 +72,7 @@ export default function DetailCeritaBK({ params }: DetailCeritaProps): JSX.Eleme
 
       <button
         onClick={kirimBalasan}
-        className="mt-3 bg-blue-700 text-white px-5 py-3 rounded-xl shadow-lg"
+        className="mt-3 bg-blue-700 text-white px-5 py-3 rounded-xl shadow-lg hover:bg-blue-800"
       >
         Kirim Balasan
       </button>

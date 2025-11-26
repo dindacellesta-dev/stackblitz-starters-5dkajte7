@@ -40,7 +40,7 @@ export default function BK_BacaCeritaPage(): JSX.Element {
 
       setListCerita(data);
 
-      // isi balasan awal saat data masuk
+      // Set balasan awal
       const obj: Record<string, string> = {};
       data.forEach((c) => {
         obj[c.id] = c.balasan || "";
@@ -53,6 +53,7 @@ export default function BK_BacaCeritaPage(): JSX.Element {
 
   const toggleOpen = (id: string) => {
     setOpenId((prev) => (prev === id ? null : id));
+
     setTimeout(() => {
       if (scrollRef.current[id]) {
         scrollRef.current[id]!.scrollIntoView({
@@ -72,6 +73,7 @@ export default function BK_BacaCeritaPage(): JSX.Element {
 
   return (
     <div className="min-h-screen bg-[#CDE7FF] px-5 py-8 flex flex-col items-center relative">
+      
       {/* Tombol Kembali */}
       <button
         onClick={() => router.push("/bk/dashboard")}
@@ -98,13 +100,17 @@ export default function BK_BacaCeritaPage(): JSX.Element {
             >
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 {c.judul}
+
                 {c.isUrgent && (
                   <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     URGENT
                   </span>
                 )}
               </h2>
-              <span className="text-gray-600">{openId === c.id ? "▲" : "▼"}</span>
+
+              <span className="text-gray-600">
+                {openId === c.id ? "▲" : "▼"}
+              </span>
             </button>
 
             {/* Isi cerita */}
